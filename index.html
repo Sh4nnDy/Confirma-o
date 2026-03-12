@@ -22,10 +22,9 @@
             font-family: 'Montserrat', sans-serif;
             color: var(--marrom-texto);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            /* CORREÇÃO: Permite rolagem vertical em telas pequenas */
             overflow-x: hidden;
             overflow-y: auto; 
             position: relative;
@@ -99,19 +98,17 @@
             position: relative;
             width: 100%;
             max-width: 420px;
-            /* CORREÇÃO: Altura adaptável com padding para não cortar */
             min-height: 100vh;
-            height: auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 40px 20px; 
-            z-index: 10; 
+            padding: 50px 20px; 
+            z-index: 10;
+            margin: auto; /* Centraliza verticalmente no espaço disponível */
         }
 
         .card-arco {
             width: 100%;
-            /* CORREÇÃO: Altura flexível para o conteúdo caber sempre */
             height: auto;
             background: var(--arco-bg);
             border: 7px solid var(--dourado-arco);
@@ -119,7 +116,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 70px 30px 40px;
+            justify-content: center; /* Centraliza conteúdo interno */
+            padding: 80px 30px 60px;
             text-align: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.08);
             position: relative;
@@ -156,6 +154,7 @@
             border: 1px solid rgba(188, 156, 112, 0.2);
             position: relative;
             z-index: 6;
+            width: 100%;
         }
 
         .btn-stack { width: 100%; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 6; }
@@ -248,7 +247,7 @@
             <p style="font-size: 0.75rem; margin-bottom: 25px; position: relative; z-index: 6;">📍 RUA ITAPETININGA, 104</p>
             <div class="btn-stack">
                 <a href="https://forms.gle/CN7gDBXfRJ5Yu6ky5" target="_blank" class="btn"><span>✅</span> CONFIRMAR PRESENÇA</a>
-                <button class="btn" onclick="window.open('https://maps.google.com', '_blank')"><span>📍</span> LOCALIZAÇÃO</button>
+                <button class="btn" onclick="window.open('https://maps.app.goo.gl/8QiL9cSS7SXr73xS8', '_blank')"><span>📍</span> LOCALIZAÇÃO</button>
                 <button class="btn" onclick="openModal()"><span>🎁</span> SUGESTÃO DE PRESENTES</button>
             </div>
         </div>
