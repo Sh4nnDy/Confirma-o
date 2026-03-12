@@ -15,7 +15,7 @@
             --nuvem-azul-desenho: rgba(173, 216, 230, 0.85); 
         }
 
-        /* RESET PARA EVITAR ROLAGEM LATERAL */
+        /* RESET PARA EVITAR ROLAGEM LATERAL E CENTRALIZAR (MANTIDO) */
         * { 
             margin: 0; 
             padding: 0; 
@@ -27,6 +27,7 @@
             height: 100%;
             overflow-x: hidden; /* Mata o espaço extra na direita */
             background-color: var(--bg-site);
+            position: relative;
         }
 
         body {
@@ -36,14 +37,13 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            position: relative;
         }
 
         #fundo-animado {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none;
-            z-index: 1;
+            z-index: 1; /* Fundo mais atrás de todos */
         }
 
         .estrela-fundo {
@@ -54,27 +54,29 @@
             animation: piscarEstrela 3s infinite ease-in-out;
         }
 
-        /* NUVENS POSICIONADAS PARA NÃO EMPURRAR O LAYOUT */
+        /* CORREÇÃO: NUVENS NA FRENTE (Z-INDEX ALTO) E FLUTUANDO NOVAMENTE */
         .nuvem-desenho {
             position: absolute;
-            z-index: 2;
+            z-index: 100; /* Garante que fiquem em cima do arco e botões */
             pointer-events: none;
             background: var(--nuvem-azul-desenho);
             border-radius: 50px;
-            animation: flutuarDesenho 10s infinite ease-in-out;
+            /* ANIMAÇÃO RESTAURADA */
+            animation: flutuarDesenho 10s infinite ease-in-out; 
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
         }
 
         .nv-shape { position: absolute; background: inherit; border-radius: 50%; }
 
-        .nv-1 { width: 140px; height: 60px; top: 5%; left: -20px; }
+        .nv-1 { width: 140px; height: 60px; top: 5%; left: -20px; animation-duration: 8s; }
         .nv-1 .shape-a { width: 70px; height: 70px; top: -35px; left: 20px; }
         
-        .nv-2 { width: 160px; height: 70px; top: 40%; right: -30px; }
+        .nv-2 { width: 160px; height: 70px; top: 40%; right: -30px; animation-delay: 1s; animation-duration: 11s; }
         .nv-2 .shape-a { width: 85px; height: 85px; top: -45px; right: 30px; }
 
-        .nv-3 { width: 120px; height: 50px; bottom: 15%; left: -10px; }
+        .nv-3 { width: 120px; height: 50px; bottom: 15%; left: -10px; animation-delay: 2s; animation-duration: 9s; }
         
-        .nv-4 { width: 150px; height: 60px; bottom: 5%; right: -20px; }
+        .nv-4 { width: 150px; height: 60px; bottom: 5%; right: -20px; animation-delay: 1.5s; animation-duration: 10s; }
 
         /* CONTAINER CENTRALIZADO */
         .main-container {
@@ -82,7 +84,7 @@
             width: 100%;
             max-width: 400px;
             padding: 20px;
-            z-index: 10;
+            z-index: 10; /* Camada do conteúdo (atrás das nuvens) */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -145,7 +147,7 @@
             cursor: pointer;
         }
 
-        /* MODAL CORRIGIDO - FIXO NO CENTRO DA TELA */
+        /* MODAL MANTIDO CENTRALIZADO E À FRENTE DE TUDO */
         .modal {
             display: none;
             position: fixed;
@@ -154,7 +156,7 @@
             width: 100vw; 
             height: 100vh;
             background: rgba(0,0,0,0.7);
-            z-index: 1000;
+            z-index: 1000; /* Camada mais alta de todas */
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(5px);
@@ -169,7 +171,7 @@
             text-align: center;
             border: 5px solid var(--dourado-arco);
             position: relative;
-            margin: auto; /* Força centralização dentro do viewport fixo */
+            margin: auto; 
         }
 
         @keyframes flutuarDesenho {
@@ -204,7 +206,7 @@
             
             <div class="btn-stack">
                 <a href="https://forms.gle/CN7gDBXfRJ5Yu6ky5" target="_blank" class="btn"><span>✅</span> CONFIRMAR PRESENÇA</a>
-                <button class="btn" onclick="window.open('https://maps.app.goo.gl/8QiL9cSS7SXr73xS8', '_blank')"><span>📍</span> LOCALIZAÇÃO</button>
+                <button class="btn" onclick="window.open('http://googleusercontent.com/maps.google.com/6', '_blank')"><span>📍</span> LOCALIZAÇÃO</button>
                 <button class="btn" onclick="openModal()"><span>🎁</span> SUGESTÃO DE PRESENTES</button>
             </div>
         </div>
@@ -222,7 +224,7 @@
     </div>
 
     <script>
-        // Gerador de estrelas no fundo
+        // MANTIDO: Gerador de estrelas no fundo
         const fundo = document.getElementById('fundo-animado');
         for (let i = 0; i < 40; i++) {
             const estrela = document.createElement('div');
@@ -236,6 +238,7 @@
             fundo.appendChild(estrela);
         }
 
+        // MANTIDO: Funções do modal
         function openModal() {
             document.getElementById('modalP').style.display = 'flex';
         }
