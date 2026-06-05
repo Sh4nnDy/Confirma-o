@@ -7,245 +7,607 @@
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-site: #e5e0d8; 
+            --bg-site: linear-gradient(180deg, #e5e0d8 0%, #d4c9b8 100%);
             --arco-bg: #fdfaf5;
             --dourado-arco: #dccbb4;
             --marrom-texto: #5d4a3e;
             --dourado-texto: #bc9c70;
-            --nuvem-azul-desenho: rgba(173, 216, 230, 0.85); 
+            --nuvem-rosa-desenho: rgba(255, 182, 193, 0.92);
+            --brilho: #f5e8c7;
         }
 
-        /* RESET PARA EVITAR ROLAGEM LATERAL E CENTRALIZAR (MANTIDO) */
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         html, body {
             width: 100%;
             height: 100%;
-            overflow-x: hidden; /* Mata o espaço extra na direita */
-            background-color: var(--bg-site);
+            overflow-x: hidden;
+            background: var(--bg-site);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--marrom-texto);
             position: relative;
         }
 
-        body {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--marrom-texto);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        #fundo-animado {
+        /* CANVAS DE FUNDO PARA ANIMAÇÕES AVANÇADAS (estrelas + partículas suaves) */
+        #canvas-fundo {
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
             pointer-events: none;
-            z-index: 1; /* Fundo mais atrás de todos */
         }
 
-        .estrela-fundo {
-            position: absolute;
-            background-color: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #fff;
-            animation: piscarEstrela 3s infinite ease-in-out;
-        }
-
-        /* CORREÇÃO: NUVENS NA FRENTE (Z-INDEX ALTO) E FLUTUANDO NOVAMENTE */
+        /* NUVENS MELHORADAS - mais volumosas, com múltiplas camadas e animações suaves */
         .nuvem-desenho {
             position: absolute;
-            z-index: 100; /* Garante que fiquem em cima do arco e botões */
+            z-index: 20;
             pointer-events: none;
-            background: var(--nuvem-azul-desenho);
-            border-radius: 50px;
-            /* ANIMAÇÃO RESTAURADA */
-            animation: flutuarDesenho 10s infinite ease-in-out; 
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+            animation: flutuarSuave 14s infinite ease-in-out;
         }
 
-        .nv-shape { position: absolute; background: inherit; border-radius: 50%; }
+        .nuvem-desenho::before,
+        .nuvem-desenho::after,
+        .nuvem-desenho .puff {
+            content: '';
+            position: absolute;
+            background: var(--nuvem-rosa-desenho);
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.3);
+        }
 
-        .nv-1 { width: 140px; height: 60px; top: 5%; left: -20px; animation-duration: 8s; }
-        .nv-1 .shape-a { width: 70px; height: 70px; top: -35px; left: 20px; }
-        
-        .nv-2 { width: 160px; height: 70px; top: 40%; right: -30px; animation-delay: 1s; animation-duration: 11s; }
-        .nv-2 .shape-a { width: 85px; height: 85px; top: -45px; right: 30px; }
+        /* Nuvem 1 - maior e mais cheia */
+        .nv-1 {
+            width: 210px;
+            height: 85px;
+            top: 8%;
+            left: -30px;
+            animation-duration: 13s;
+            animation-delay: 0s;
+        }
+        .nv-1::before { width: 95px; height: 95px; top: -38px; left: 25px; }
+        .nv-1::after  { width: 75px; height: 75px; top: -28px; right: 25px; }
+        .nv-1 .puff { width: 65px; height: 65px; top: -22px; left: 70px; }
 
-        .nv-3 { width: 120px; height: 50px; bottom: 15%; left: -10px; animation-delay: 2s; animation-duration: 9s; }
-        
-        .nv-4 { width: 150px; height: 60px; bottom: 5%; right: -20px; animation-delay: 1.5s; animation-duration: 10s; }
+        /* Nuvem 2 */
+        .nv-2 {
+            width: 185px;
+            height: 78px;
+            top: 38%;
+            right: -40px;
+            animation-duration: 17s;
+            animation-delay: 2.5s;
+        }
+        .nv-2::before { width: 88px; height: 88px; top: -42px; left: 18px; }
+        .nv-2::after  { width: 82px; height: 82px; top: -35px; right: 35px; }
+        .nv-2 .puff { width: 55px; height: 55px; top: -25px; left: 55px; }
 
-        /* CONTAINER CENTRALIZADO */
+        /* Nuvem 3 */
+        .nv-3 {
+            width: 145px;
+            height: 65px;
+            bottom: 22%;
+            left: -25px;
+            animation-duration: 11s;
+            animation-delay: 4s;
+        }
+        .nv-3::before { width: 70px; height: 70px; top: -32px; left: 15px; }
+        .nv-3::after  { width: 60px; height: 60px; top: -25px; right: 20px; }
+
+        /* Nuvem 4 - menor e mais rápida */
+        .nv-4 {
+            width: 165px;
+            height: 72px;
+            bottom: 8%;
+            right: -35px;
+            animation-duration: 15s;
+            animation-delay: 1s;
+        }
+        .nv-4::before { width: 80px; height: 80px; top: -38px; left: 20px; }
+        .nv-4::after  { width: 68px; height: 68px; top: -30px; right: 28px; }
+        .nv-4 .puff { width: 58px; height: 58px; top: -20px; left: 65px; }
+
+        @keyframes flutuarSuave {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50%      { transform: translate(18px, -14px) rotate(3deg); }
+        }
+
+        /* CONTAINER PRINCIPAL */
         .main-container {
             position: relative;
             width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            z-index: 10; /* Camada do conteúdo (atrás das nuvens) */
+            max-width: 420px;
+            padding: 20px 15px;
+            z-index: 10;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: auto; /* Centralização garantida */
+            min-height: 100vh;
+            justify-content: center;
         }
 
+        /* CARTÃO COM ARCO MAIS ELEGANTE E 3D */
         .card-arco {
             width: 100%;
             background: var(--arco-bg);
-            border: 7px solid var(--dourado-arco);
-            border-radius: 200px 200px 40px 40px;
-            padding: 60px 25px 40px;
+            border: 8px solid var(--dourado-arco);
+            border-radius: 220px 220px 50px 50px;
+            padding: 65px 28px 45px;
             text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.12),
+                0 0 0 12px rgba(220, 203, 180, 0.15);
             position: relative;
+            overflow: hidden;
+            animation: cardPop 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
         }
 
-        h1 { 
-            font-family: 'Great Vibes', cursive; 
-            font-size: 3.2rem; 
-            color: var(--dourado-texto); 
-            margin-bottom: 10px;
+        .card-arco::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(188,156,112,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: brilhoArco 6s infinite ease-in-out;
         }
-        
+
+        @keyframes cardPop {
+            0%   { transform: scale(0.75) translateY(40px); opacity: 0; }
+            70%  { transform: scale(1.08) translateY(-10px); }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        @keyframes brilhoArco {
+            0%, 100% { opacity: 0.6; }
+            50%      { opacity: 1; }
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.6rem;
+            color: var(--dourado-texto);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-shadow: 0 4px 12px rgba(188, 156, 112, 0.25);
+            animation: titleGlow 4s infinite ease-in-out;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 4px 12px rgba(188, 156, 112, 0.25); }
+            50%      { text-shadow: 0 8px 25px rgba(188, 156, 112, 0.45); }
+        }
+
         .versiculo {
             font-family: 'Playfair Display', serif;
             font-style: italic;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin: 15px 0;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 20px 0 18px;
             color: #8a766a;
+            position: relative;
+        }
+
+        .versiculo::before,
+        .versiculo::after {
+            content: '✧';
+            color: var(--dourado-texto);
+            font-size: 1.4rem;
+            opacity: 0.6;
+            margin: 0 8px;
         }
 
         .data-info {
-            background: rgba(220, 203, 180, 0.15);
-            padding: 12px;
-            border-radius: 12px;
-            margin: 15px 0;
+            background: rgba(220, 203, 180, 0.18);
+            padding: 14px 18px;
+            border-radius: 16px;
+            margin: 18px 0;
             font-weight: 600;
-            font-size: 0.85rem;
-            border: 1px solid rgba(188, 156, 112, 0.2);
+            font-size: 0.9rem;
+            border: 1px solid rgba(188, 156, 112, 0.25);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        .btn-stack { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-        
-        .btn {
+        /* CONTADOR REGRESSIVO - NOVO E DINÂMICO */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0 25px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
             background: white;
             border: 2px solid var(--dourado-texto);
-            padding: 15px;
+            border-radius: 12px;
+            padding: 8px 14px;
+            min-width: 68px;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(188, 156, 112, 0.15);
+        }
+
+        .countdown-item span {
+            display: block;
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--marrom-texto);
+            line-height: 1;
+        }
+
+        .countdown-item small {
+            font-size: 0.7rem;
+            color: var(--dourado-texto);
+            font-weight: 500;
+        }
+
+        .btn-stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .btn {
+            background: white;
+            border: 2.5px solid var(--dourado-texto);
+            padding: 16px 20px;
             border-radius: 50px;
             text-decoration: none;
             color: var(--marrom-texto);
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            transition: 0.3s;
+            gap: 12px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            box-shadow: 0 8px 20px rgba(188, 156, 112, 0.2);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* MODAL MANTIDO CENTRALIZADO E À FRENTE DE TUDO */
+        .btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(188, 156, 112, 0.35);
+            background: #fffdf7;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 40%;
+            height: 300%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-25deg);
+            animation: btnShine 4s infinite linear;
+            opacity: 0;
+        }
+
+        .btn:hover::after {
+            opacity: 1;
+            animation-duration: 1.8s;
+        }
+
+        @keyframes btnShine {
+            100% { transform: translateX(300%); }
+        }
+
+        /* MODAL MAIS BONITO E COM ANIMAÇÃO DE ENTRADA */
         .modal {
             display: none;
             position: fixed;
-            top: 0; 
-            left: 0; 
-            width: 100vw; 
+            top: 0;
+            left: 0;
+            width: 100vw;
             height: 100vh;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000; /* Camada mais alta de todas */
+            background: rgba(93, 74, 62, 0.75);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
         }
 
         .modal-content {
             background: var(--arco-bg);
-            padding: 30px;
-            border-radius: 25px;
-            width: 85%;
-            max-width: 350px;
+            padding: 35px 28px;
+            border-radius: 30px;
+            width: 88%;
+            max-width: 360px;
             text-align: center;
-            border: 5px solid var(--dourado-arco);
+            border: 6px solid var(--dourado-arco);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+            animation: modalPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
-            margin: auto; 
         }
 
-        @keyframes flutuarDesenho {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(8px, -8px); }
+        @keyframes modalPop {
+            0%   { transform: scale(0.6) translateY(80px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
         }
 
-        @keyframes piscarEstrela {
-            0%, 100% { opacity: 0.2; transform: scale(0.5); }
-            50% { opacity: 1; transform: scale(1.1); }
+        .modal-content h2 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.4rem;
+            color: var(--dourado-texto);
+            margin-bottom: 12px;
+        }
+
+        .modal-content .tamanhos {
+            display: flex;
+            justify-content: space-around;
+            margin: 28px 0 30px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--dourado-texto);
+        }
+
+        .modal-content .tamanhos span {
+            transition: transform 0.3s ease;
+        }
+
+        .modal-content .tamanhos span:hover {
+            transform: scale(1.3) rotate(8deg);
         }
     </style>
 </head>
 <body>
+    <canvas id="canvas-fundo"></canvas>
 
-    <div id="fundo-animado"></div>
-
-    <div class="nuvem-desenho nv-1"><div class="nv-shape shape-a"></div></div>
-    <div class="nuvem-desenho nv-2"><div class="nv-shape shape-a"></div></div>
+    <div class="nuvem-desenho nv-1"><div class="puff"></div></div>
+    <div class="nuvem-desenho nv-2"><div class="puff"></div></div>
     <div class="nuvem-desenho nv-3"></div>
-    <div class="nuvem-desenho nv-4"></div>
+    <div class="nuvem-desenho nv-4"><div class="puff"></div></div>
 
     <div class="main-container">
         <div class="card-arco">
             <h1>Chá de Fralda</h1>
-            <div class="versiculo">
-                “Por este menino orava eu; e o Senhor me concedeu a petição que eu lhe fiz.”<br>
-                <strong>1 SAMUEL 1:27</strong>
-            </div>
-            <div class="data-info">📅 12 DE JULHO DE 2026<br>🕒 ÀS 16:00 HORAS</div>
-            <p style="font-size: 0.75rem; margin-bottom: 20px;">📍 RUA ITAPETININGA, 104</p>
             
+            <div class="versiculo">
+                “Por este menino orava eu;<br>e o Senhor me concedeu a petição que eu lhe fiz.”
+                <br><strong>1 SAMUEL 1:27</strong>
+            </div>
+
+            <div class="data-info">
+                📅 12 DE JULHO DE 2026<br>
+                🕒 ÀS 15:00 HORAS
+            </div>
+
+            <div id="countdown" class="countdown">
+                <div class="countdown-item">
+                    <span id="days">00</span>
+                    <small>DIAS</small>
+                </div>
+                <div class="countdown-item">
+                    <span id="hours">00</span>
+                    <small>HORAS</small>
+                </div>
+                <div class="countdown-item">
+                    <span id="minutes">00</span>
+                    <small>MIN</small>
+                </div>
+                <div class="countdown-item">
+                    <span id="seconds">00</span>
+                    <small>SEG</small>
+                </div>
+            </div>
+
+            <p style="font-size: 0.82rem; margin-bottom: 22px; opacity: 0.9;">📍 RUA ITAPETININGA, 104</p>
+
             <div class="btn-stack">
-                <a href="https://forms.gle/CN7gDBXfRJ5Yu6ky5" target="_blank" class="btn"><span>✅</span> CONFIRMAR PRESENÇA</a>
-                <button class="btn" onclick="window.open('https://maps.app.goo.gl/8QiL9cSS7SXr73xS8', '_blank')"><span>📍</span> LOCALIZAÇÃO</button>
-                <button class="btn" onclick="openModal()"><span>🎁</span> SUGESTÃO DE PRESENTES</button>
+                <a href="https://forms.gle/CN7gDBXfRJ5Yu6ky5" target="_blank" class="btn">
+                    <span style="font-size:1.3rem;">✅</span> CONFIRMAR PRESENÇA
+                </a>
+                <button onclick="abrirLocalizacao()" class="btn">
+                    <span style="font-size:1.3rem;">📍</span> VER NO MAPA
+                </button>
+                <button onclick="openModal()" class="btn">
+                    <span style="font-size:1.3rem;">🎁</span> SUGESTÃO DE PRESENTES
+                </button>
             </div>
         </div>
     </div>
 
     <div id="modalP" class="modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h2 style="font-family: 'Playfair Display'; color: var(--dourado-texto); margin-bottom: 15px;">Sugestão de Presentes</h2>
-            <p style="margin-bottom: 20px;">Fralda + Mimo</p>
-            <div style="display: flex; justify-content: space-around; font-weight: bold; color: var(--dourado-texto); font-size: 1.3rem; margin-bottom: 25px;">
-                <span>P</span> <span>M</span> <span>G</span>
+            <h2>Sugestão de Presentes</h2>
+            <p style="margin-bottom: 10px; font-size:1.1rem;">Fralda + Mimo</p>
+            
+            <div class="tamanhos">
+                <span>P</span>
+                <span>M</span>
+                <span>G</span>
             </div>
-            <button class="btn" style="background: var(--dourado-texto); color: white; width: 100%;" onclick="closeModal()">FECHAR</button>
+            
+            <p style="font-size:0.9rem; margin-bottom: 30px; color:#8a766a;">
+                Qualquer tamanho será uma bênção para o enxoval do bebê!
+            </p>
+            
+            <button class="btn" style="background: var(--dourado-texto); color: white; width: 100%;" onclick="closeModal()">
+                FECHAR
+            </button>
         </div>
     </div>
 
     <script>
-        // MANTIDO: Gerador de estrelas no fundo
-        const fundo = document.getElementById('fundo-animado');
-        for (let i = 0; i < 40; i++) {
-            const estrela = document.createElement('div');
-            estrela.className = 'estrela-fundo';
-            estrela.style.left = Math.random() * 100 + 'vw';
-            estrela.style.top = Math.random() * 100 + 'vh';
-            const size = Math.random() * 3 + 1 + 'px';
-            estrela.style.width = size;
-            estrela.style.height = size;
-            estrela.style.animationDelay = Math.random() * 5 + 's';
-            fundo.appendChild(estrela);
+        // ==================== CANVAS - ESTRELAS E PARTÍCULAS DINÂMICAS ====================
+        const canvas = document.getElementById('canvas-fundo');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        const stars = [];
+        const particles = [];
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
         }
 
-        // MANTIDO: Funções do modal
+        class Star {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 3.2 + 0.8;
+                this.speed = Math.random() * 0.8 + 0.3;
+                this.opacity = Math.random();
+            }
+            update() {
+                this.opacity += Math.sin(Date.now() * this.speed / 1000) * 0.03;
+                if (this.opacity > 1) this.opacity = 1;
+                if (this.opacity < 0.2) this.opacity = 0.2;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = '#fffdf7';
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = '#f5e8c7';
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        // Partículas suaves (brilho dourado sutil)
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height * 0.6;
+                this.size = Math.random() * 4 + 1;
+                this.vx = (Math.random() - 0.5) * 0.6;
+                this.vy = -Math.random() * 1.2 - 0.4;
+                this.life = 80;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life--;
+                this.size *= 0.98;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.life / 80;
+                ctx.fillStyle = '#bc9c70';
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#f5e8c7';
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function initBackground() {
+            resizeCanvas();
+            stars.length = 0;
+            for (let i = 0; i < 65; i++) {
+                stars.push(new Star());
+            }
+        }
+
+        function animateBackground() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Desenha estrelas
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+
+            // Adiciona partículas ocasionalmente
+            if (Math.random() < 0.12) {
+                particles.push(new Particle());
+            }
+
+            // Atualiza e desenha partículas
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                if (p.life <= 0 || p.size < 0.3) particles.splice(i, 1);
+            }
+
+            requestAnimationFrame(animateBackground);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initBackground();
+        });
+
+        // ==================== CONTADOR REGRESSIVO ====================
+        function iniciarContador() {
+            const targetDate = new Date('2026-07-12T15:00:00-03:00').getTime();
+
+            function update() {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    document.getElementById('countdown').innerHTML = `
+                        <div style="color:#bc9c70;font-size:1.1rem;font-weight:600;">
+                            🎉 O grande dia chegou!
+                        </div>`;
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+
+                setTimeout(update, 1000);
+            }
+            update();
+        }
+
+        // ==================== FUNÇÕES DO MODAL ====================
         function openModal() {
-            document.getElementById('modalP').style.display = 'flex';
+            const modal = document.getElementById('modalP');
+            modal.style.display = 'flex';
         }
 
         function closeModal(e) {
-            document.getElementById('modalP').style.display = 'none';
+            if (e) e.stopImmediatePropagation();
+            const modal = document.getElementById('modalP');
+            modal.style.display = 'none';
         }
+
+        // ==================== LOCALIZAÇÃO ====================
+        function abrirLocalizacao() {
+            // Link corrigido e funcional
+            window.open('https://www.google.com/maps/search/?api=1&query=Rua+Itapetininga%2C+104', '_blank');
+        }
+
+        // ==================== INICIALIZAÇÃO ====================
+        window.onload = function() {
+            initBackground();
+            animateBackground();
+            iniciarContador();
+
+            console.log('%c🎉 Convite animado carregado com sucesso!', 'color:#bc9c70; font-size:13px; font-weight:600;');
+        };
     </script>
 </body>
 </html>
